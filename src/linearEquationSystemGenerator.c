@@ -59,6 +59,8 @@ int main(int argc, void **argv)
     /*
     * Imprime as matrizes geradas na tela e no arquivo randomMatrix.txt
     * */
+    fprintf(arq, "%d\n", equationCount); //primeira linha define o número de equações
+
     printf("--- Matriz de coeficientes A ----\n");
     for(i = 0; i < equationCount; i++)
     {
