@@ -54,6 +54,7 @@ dkms.conf
 # linux executable files
 linearEquationSystemGenerator
 serialGaussianElimination
+pthreadsGaussianElimination
 
 #generated files
 randomMatrix.txt
