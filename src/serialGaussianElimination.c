@@ -4,7 +4,7 @@
 #include "../lib/linearEquationFileReader.h"
 
 
-void backSubstitution(int m, double **a, double *b, double* k)
+void backSubstitution(int m, double **a, double *b, double* x)
 {
     int i = 0, j = 0;
     double sum;
@@ -13,9 +13,9 @@ void backSubstitution(int m, double **a, double *b, double* k)
         sum = 0;
         for(j=i+1; j < m; j++) //para cada coluna
         {
-            sum += a[i][j] * k[j];
+            sum += a[i][j] * x[j];
         }
-        k[i] = (b[i] - sum) / a[i][i];
+        x[i] = (b[i] - sum) / a[i][i];
     }
 }
 
@@ -55,28 +55,28 @@ void gaussElimination(int m, double **a, double *b){
 
 int main(int argc, void **argv)
 {
-    int *m;
+    int m;
     double **a;
     double *b;
     getMatrixAandB(&m, &a, &b);
-    double *k = malloc((*m)*sizeof(double));
+    double *x = malloc(m*sizeof(double));
 
     printf("*** Matriz ****\n");
-    for(int i=0; i < (*m); i++)
+    for(int i=0; i < m; i++)
     {
-        for(int j=0; j < (*m); j++)
+        for(int j=0; j < m; j++)
             printf("%lf ", a[i][j]);
         printf("%lf\n", b[i]);
     }
     printf("\n");
 
-    gaussElimination((*m), a, b);
-    backSubstitution((*m), a, b, k);
+    gaussElimination(m, a, b);
+    backSubstitution(m, a, b, x);
 
-    printf("*** Vetor K ***\n");
-    for(int j=0; j < (*m); j++)
+    printf("*** Vetor X ***\n");
+    for(int j=0; j < m; j++)
     {
-        printf("X%d = %lf\n", j, k[j]);
+        printf("X%d = %lf\n", j, x[j]);
     }
 
     return 0;
