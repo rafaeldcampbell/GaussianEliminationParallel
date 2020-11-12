@@ -2,7 +2,7 @@
 #define LINEAREQUATIONFILEREADER
 #include <stdlib.h>
 
-int getMatrixAandB(int** n /*receberá a quantidade de equações lidas*/,
+int getMatrixAandB(int* n /*receberá a quantidade de equações lidas*/,
                double*** A /*receberá a matriz A*/,
                double** B /*receberá a matriz B*/)
 /*
@@ -16,25 +16,24 @@ int getMatrixAandB(int** n /*receberá a quantidade de equações lidas*/,
         return -1;
     }
 
-    *n = (int*) malloc(sizeof(int));
-    fscanf(arq, "%d\n", *n); //le a primeira linha, definindo a quantidade de equações
+    fscanf(arq, "%d\n", n); //le a primeira linha, definindo a quantidade de equações
     int i,j; //variáveis para loops
 
     /*
     * Alocando espaço para matriz A
     * */
-    *A = (double**) malloc((**n) * sizeof(double*));
-    for(i = 0; i < (**n); i++)
+    *A = (double**) malloc((*n) * sizeof(double*));
+    for(i = 0; i < (*n); i++)
     {
-        (*A)[i] = (double*) malloc((**n) * sizeof(double));
+        (*A)[i] = (double*) malloc((*n) * sizeof(double));
     }
 
     /*
     * Lendo valores do arquivo para matriz A
     * */
-    for(i = 0; i < (**n); i++) //para cada linha
+    for(i = 0; i < (*n); i++) //para cada linha
     {
-        for(j = 0; j < (**n); j++) //para cada valor na linha
+        for(j = 0; j < (*n); j++) //para cada valor na linha
         {
             fscanf(arq, "%lf ", &((*A)[i][j])); //le um valor e guarda na matriz
         }
@@ -45,12 +44,12 @@ int getMatrixAandB(int** n /*receberá a quantidade de equações lidas*/,
      /*
     * Alocando espaço para matriz B
     * */
-    *B = (double*) malloc((**n) * sizeof(double));
+    *B = (double*) malloc((*n) * sizeof(double));
     
     /*
     * Lendo os campos da matriz B
     * */
-    for(i = 0; i < (**n); i++) //para cada linha
+    for(i = 0; i < (*n); i++) //para cada linha
     {
         fscanf(arq, "%lf\n", &((*B)[i])); //le a quebra de linha
     }
