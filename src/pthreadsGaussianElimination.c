@@ -14,9 +14,7 @@ struct gauss_elimination_param{
 	double* arrayB;
 };
 
-//função para ser chamada pelo pthreads
-void *gaussEliminationPthread( void *param){
-
+void *partialPivotingPthread(void *param){
 	//recupera as informações recebidas como parametro pelo pthreads_create
 	struct gauss_elimination_param* threadParam = (struct gauss_elimination_param*) param;
 	int i = threadParam->col;
@@ -25,7 +23,7 @@ void *gaussEliminationPthread( void *param){
 	int m = threadParam->matrixSize;
 	double *b = threadParam->arrayB;
 	
-	printf("Chamou thread %i\n ", thread);
+	printf("Chamou partial pivoting thread %i\n ", thread);
 	
 	int k, j;
 	//Pivoteamento. Para separar a coluna de acordo com o número de threads, se usa a mesma ideia do cycling striped;
@@ -46,6 +44,23 @@ void *gaussEliminationPthread( void *param){
                 b[i] = temp;
             }
         }
+
+}
+
+//função para ser chamada pelo pthreads
+void *gaussPthread( void *param){
+
+	//recupera as informações recebidas como parametro pelo pthreads_create
+	struct gauss_elimination_param* threadParam = (struct gauss_elimination_param*) param;
+	int i = threadParam->col;
+	int thread = threadParam->threadNumber;
+	double **a = threadParam->matrix;
+	int m = threadParam->matrixSize;
+	double *b = threadParam->arrayB;
+	
+	printf("Chamou thread gauss elimination %i\n ", thread);
+	
+	int k, j;
 	
 	//ELIMINAÇÃO GAUSSIANA utilizando cycling striped. Começa pulando "+thread" e salta pelo número de threads	
 	for(k=i + 1 +thread; k<m;k = k + NUM_THREADS){ //para cada linha
@@ -90,6 +105,8 @@ void gaussElimination(int m, double **a, double *b){
         //Cria o vetor de parametros. Um parametro para cada thread que será inicializado
         struct gauss_elimination_param* param = malloc(NUM_THREADS * sizeof(struct gauss_elimination_param));
         
+        double beginnnig = clock();
+        
         int threadOpen, threadJoin;
         //Iniciliza os threads contendoa a função para fazer a eliminação gaussiana
         for(threadOpen = 0; threadOpen < NUM_THREADS; threadOpen++){
@@ -100,13 +117,32 @@ void gaussElimination(int m, double **a, double *b){
         	param[threadOpen].matrixSize = m;
         	param[threadOpen].arrayB = b;
         	//inicializa um thread
-        	pthread_create(&threadArray[threadOpen], NULL, gaussEliminationPthread, &param[threadOpen]);
+        	pthread_create(&threadArray[threadOpen], NULL, partialPivotingPthread, &param[threadOpen]);
         }
         
         //espera todos os threads terminarem
         for(threadJoin = 0; threadJoin < NUM_THREADS; threadJoin++){
         	pthread_join(threadArray[threadJoin], NULL);
         }
+        
+        
+        //Iniciliza os threads contendoa a função para fazer a eliminação gaussiana
+        for(threadOpen = 0; threadOpen < NUM_THREADS; threadOpen++){
+        	//passa os parametros para a estrutura
+        	param[threadOpen].col = i;
+        	param[threadOpen].threadNumber = threadOpen;
+        	//inicializa um thread
+        	pthread_create(&threadArray[threadOpen], NULL, gaussPthread, &param[threadOpen]);
+        }
+        
+        //espera todos os threads terminarem
+        for(threadJoin = 0; threadJoin < NUM_THREADS; threadJoin++){
+        	pthread_join(threadArray[threadJoin], NULL);
+        }
+        
+        double end = clock();
+        
+        printf("Tempo de duração eliminação gaussiana com pivoteamento pthreads %f\n", ((double) (end - beginnnig)) / CLOCKS_PER_SEC);
 
         free(param);
         
