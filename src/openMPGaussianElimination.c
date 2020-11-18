@@ -80,7 +80,6 @@ void gaussElimination(int m, double **a, double *b){
 int main(int argc, char **argv)
 {
     omp_set_num_threads(NTHREADS); //define numero de threads
-    double time = -omp_get_wtime(); //inicia a contagem de tempo
 
     int printMatrix = 0;
     int printResult = 0;
@@ -94,6 +93,8 @@ int main(int argc, char **argv)
     double *b;
     getMatrixAandB(&m, &a, &b); //realiza a leitura do arquivo gerado
     double *x = malloc(m*sizeof(double)); //aloca espaço pro vetor de variáveis
+
+    double time = -omp_get_wtime(); //inicia a contagem de tempogc
 
     if(printMatrix){ //imprime a matriz A extendida
         printf("*** Matriz A|B****\n");

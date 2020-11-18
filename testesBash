@@ -1,0 +1,53 @@
+#!/bin/bash
+
+cd src/
+gcc linearEquationSystemGenerator.c -o linearEquationSystemGenerator
+gcc serialGaussianElimination.c -o serialGaussianElimination -lm
+gcc pthreadsGaussianElimination.c -o pthreadsGaussianElimination -lm -lpthread
+mpicc MPIGaussianElimination.c -o MPIGaussianElimination -lm
+gcc openMPGaussianElimination.c -o openMPGaussianElimination -lm -fopenmp
+
+
+./linearEquationSystemGenerator -n 1500
+printf '\n\nTestes com n = 1500\n\n'
+printf 'Serial\n'
+./serialGaussianElimination
+printf '\n\nMPI\n'
+mpirun -n 4 MPIGaussianElimination
+printf '\n\nPthreads'
+./pthreadsGaussianElimination
+printf '\n\nOpenMP\n'
+./openMPGaussianElimination
+
+./linearEquationSystemGenerator -n 2000
+printf '\n\nTestes com n = 2000\n\n'
+printf 'Serial\n'
+./serialGaussianElimination
+printf '\n\nMPI\n'
+mpirun -n 4 MPIGaussianElimination
+printf '\n\nPthreads'
+./pthreadsGaussianElimination
+printf '\n\nOpenMP\n'
+./openMPGaussianElimination
+
+./linearEquationSystemGenerator -n 2500
+printf '\n\nTestes com n = 2500\n\n'
+printf 'Serial\n'
+./serialGaussianElimination
+printf '\n\nMPI\n'
+mpirun -n 4 MPIGaussianElimination
+printf '\n\nPthreads'
+./pthreadsGaussianElimination
+printf '\n\nOpenMP\n'
+./openMPGaussianElimination
+
+./linearEquationSystemGenerator -n 3000
+printf '\n\nTestes com n = 3000\n\n'
+printf 'Serial\n'
+./serialGaussianElimination
+printf '\n\nMPI\n'
+mpirun -n 4 MPIGaussianElimination
+printf '\n\nPthreads'
+./pthreadsGaussianElimination
+printf '\n\nOpenMP\n'
+./openMPGaussianElimination

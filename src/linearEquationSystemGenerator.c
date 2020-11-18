@@ -74,22 +74,22 @@ int main(int argc, void **argv)
     * */
     fprintf(arq, "%d\n", equationCount); //primeira linha define o número de equações
 
-    printf("--- Matriz de coeficientes A ----\n");
+    //printf("--- Matriz de coeficientes A ----\n");
     for(i = 0; i < equationCount; i++)
     {
         for(j = 0; j < equationCount; j++)
         {
-            printf("%lf\t", matrixA[i][j]); //imprime um valor na tela
+            //printf("%lf\t", matrixA[i][j]); //imprime um valor na tela
             fprintf(arq, "%0.5lf ", matrixA[i][j]); //guarda o coeficiente no arquivo
         }
-        printf("\n");
+        //printf("\n");
         fprintf(arq, "\n"); //adiciona uma quebra de linha no arquivo
     }
     fprintf(arq, "\n"); //adiciona uma linha em branco separando as matrizes
 
-    printf("\n--- Matriz de resultado B ----\n");
+    //printf("\n--- Matriz de resultado B ----\n");
     for(i = 0; i < equationCount; i++){
-        printf("%lf\n", matrixB[i]);
+        //printf("%lf\n", matrixB[i]);
         fprintf(arq, "%0.5lf ", matrixB[i]); //guarda o valor B no arquivo
     }
     fclose(arq); //fecha o arquivo

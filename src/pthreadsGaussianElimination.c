@@ -144,11 +144,6 @@ void gaussElimination(int m, double **a, double *b){
 
 int main(int argc, void **argv)
 {
-
-    double time;
-    clock_t Ticks[2];
-    Ticks[0] = clock(); //marca inicio da contagem de tempo
-
     int printMatrix = 0;
     int printResult = 0;
     if(argc > 1 && !strcmp(argv[1], "-p")) //parâmetro "-P" determina a impressão de todas as matrizes
@@ -161,6 +156,10 @@ int main(int argc, void **argv)
     double *b;
     getMatrixAandB(&m, &a, &b); //realiza a leitura do arquivo
     double *x = malloc(m*sizeof(double)); //aloca espaço para o vetor de variáveis
+
+    double time;
+    clock_t Ticks[2];
+    Ticks[0] = clock(); //marca inicio da contagem de tempo
 
     if(printMatrix){ //imprime a matriz A estendida
         printf("*** Matriz A|B ****\n");

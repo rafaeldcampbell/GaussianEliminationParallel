@@ -210,10 +210,6 @@ int main(int argc, char **argv)
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     MPI_Comm_size( MPI_COMM_WORLD, &size );
 
-
-    MPI_Barrier(MPI_COMM_WORLD); //sincroniza processos para iniciar contagem do tempo
-    double time = -MPI_Wtime();
-
     int printMatrix = 0;
     int printResult = 0;
     if(argc > 1 && !strcmp(argv[1], "-p"))
@@ -228,6 +224,9 @@ int main(int argc, char **argv)
 
     if(rank == 0)
         getMatrixAandB(&m, &a, &b);
+
+    MPI_Barrier(MPI_COMM_WORLD); //sincroniza processos para iniciar contagem do tempo
+    double time = -MPI_Wtime();
     
     MPI_Bcast(&m, 1, MPI_INT, 0, MPI_COMM_WORLD); //garantindo que todos recebam m
     
