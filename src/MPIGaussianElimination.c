@@ -6,15 +6,12 @@
 #include <mpi.h>
 
 //estrutura utilizada no findPivotIndex
-typedef struct pivotValueIndex
-{
-    double val;
-    int index;
-} PIVOTVALUEINDEX;
+typedef struct pivotValueIndex{ double val; int index;} PIVOTVALUEINDEX;
 
 /*
-* Determina os valores de x (matriz X) dado que A é uma matriz triangular superior.
-* A substituição regressiva é inerentemente linear, portanto, não será paralelizada
+* Soma todas as colunas já calculadas -- multiplicando pelas variáveis obtidas -- e subtrai
+* do total (B). O valor resultante, dividido pelo coeficiente não calculado, representa o
+* valor de X daquela coluna.
 * */
 void backSubstitution(int m, double **a, double *b, double* x)
 {
@@ -156,9 +153,9 @@ void gaussElimination(int m, double **a, double *b, int size, int rank){
                         term = a[currentLine][c] / a[c][c]; //definindo o coeficiente
                         MPI_Send(&term, 1, MPI_DOUBLE, rankDest, 1, MPI_COMM_WORLD); //envia o coeficiente
                         MPI_Send(a[currentLine], m, MPI_DOUBLE, rankDest, 2, MPI_COMM_WORLD); //envia a linha
-                        MPI_Send(pivotLine, m, MPI_DOUBLE, rankDest, 2, MPI_COMM_WORLD); //envia a linha pivot
+                        MPI_Send(pivotLine, m, MPI_DOUBLE, rankDest, 2, MPI_COMM_WORLD); //envia a linha pivo
                         MPI_Send(&(b[currentLine]), 1, MPI_DOUBLE, rankDest, 3, MPI_COMM_WORLD); //envia o valor de B
-                        MPI_Send(&bPivot, 1, MPI_DOUBLE, rankDest, 3, MPI_COMM_WORLD); //envia o valor de B pivot
+                        MPI_Send(&bPivot, 1, MPI_DOUBLE, rankDest, 3, MPI_COMM_WORLD); //envia o valor de B pivo
                     }
                 }
                 for(j=1; j<size; j++) //recebe os valores de volta
@@ -207,11 +204,22 @@ void gaussElimination(int m, double **a, double *b, int size, int rank){
 
 int main(int argc, char **argv)
 {
+
     int rank,  size;
-    
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     MPI_Comm_size( MPI_COMM_WORLD, &size );
+
+
+    MPI_Barrier(MPI_COMM_WORLD); //sincroniza processos para iniciar contagem do tempo
+    double time = -MPI_Wtime();
+
+    int printMatrix = 0;
+    int printResult = 0;
+    if(argc > 1 && !strcmp(argv[1], "-p"))
+        printMatrix = 1;
+    if(argc > 1 && !strcmp(argv[1], "-r")) //parâmetro "-r" determina a impressão apenas do resultado
+        printResult = 1;
 
     int m; //tamanho da matriz
     double **a; //matriz de constantes
@@ -223,9 +231,9 @@ int main(int argc, char **argv)
     
     MPI_Bcast(&m, 1, MPI_INT, 0, MPI_COMM_WORLD); //garantindo que todos recebam m
     
-    if(rank == 0)
+    if(rank == 0 && printMatrix)
     {
-        printf("*** Matriz ****\n"); //imprime a matriz no estado atual
+        printf("*** Matriz A|B ****\n"); //imprime a matriz estendida no estado atual
         for(int i=0; i < m; i++)
         {
             for(int j=0; j < m; j++)
@@ -239,23 +247,28 @@ int main(int argc, char **argv)
     
     if(rank == 0)
     {
-        printf("*** Matriz triangulada ****\n"); //imprime a matriz já triangulada
-        for(int i=0; i < m; i++)
-        {
-            for(int j=0; j < m; j++)
-                printf("\t%lf ", a[i][j]);
-            printf("\t%lf\n", b[i]);
-        }
-        printf("\n");
-
-
         x = malloc(m*sizeof(double)); //aloca espaço para o vetor de X
         backSubstitution(m, a, b, x);
 
-        printf("*** Vetor X com %d elementos***\n", m);
-        for(int j=0; j < m; j++)
-            printf("X%d = %lf\n", j, x[j]);
-        
+        if(printMatrix)
+        {
+            printf("*** Matriz Triangulada ****\n"); //imprime a matriz já triangulada
+            for(int i=0; i < m; i++)
+            {
+                for(int j=0; j < m; j++)
+                    printf("\t%lf ", a[i][j]);
+                printf("\t%lf\n", b[i]);
+            }
+            printf("\n");
+        }
+
+        if(printMatrix || printResult)
+        {
+            printf("*** Vetor X ***\n");
+            for(int j=0; j < m; j++)
+                printf("X%d = %lf\n", j, x[j]);
+        }
+
         /*
         * Desalocando todos os vetores utilizados
         * */
@@ -266,6 +279,12 @@ int main(int argc, char **argv)
         free(b);
         free(x);
     }
+
+    MPI_Barrier(MPI_COMM_WORLD); //sincroniza processos para fim da contagem do tempo
+    time += MPI_Wtime();
+
+    if(rank == 0) //imprime o tempo
+        printf("**** Cálculo realizado em %lf segundos\n", time);
 
     MPI_Finalize();
     return 0;

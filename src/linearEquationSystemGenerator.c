@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #define VAL_RANGE 100 //intervalo de valores possíveis
 #define DECIMAL_FACTOR 100 //duas casas decimais
@@ -14,16 +15,28 @@ int main(int argc, void **argv)
     if(argc < 3){ //testa para caso haja erro na entrada dos parâmetros
         printf("Use \"./linearEquationSystemGenerator <x1> <x2> (<x3> ... <xn>)\", definindo os valores para ao menos 2 variáveis.\n\n");
     }
-
-    equationCount = (argc - 1); //define o numero de equações que o sistema terá (baseado no numero de variáveis)
-    double X[equationCount]; //aloca espaço para o vetor de variáveis
-
-    for(i = 0; i < equationCount; i++){ //percorre os argumentos de entrada e constroi o vetor de variáveis
-        X[i] = strtod(argv[i + 1], &eptr); //converte o valor para Double
+    double* X;
+    if(!strcmp(argv[1], "-n"))
+    {
+        equationCount = atoi(argv[2]);
+        X = (double*) malloc(equationCount*sizeof(double)); //aloca espaço para o vetor de variáveis
+        for(i = 0; i < equationCount; i++){ //percorre os argumentos de entrada e constroi o vetor de variáveis
+            X[i] = (double) i+1; //converte o valor para Double
+        }
+    }
+    else
+    {
+        equationCount = (argc - 1); //define o numero de equações que o sistema terá (baseado no numero de variáveis)
+        X = (double*) malloc(equationCount*sizeof(double)); //aloca espaço para o vetor de variáveis
+        for(i = 0; i < equationCount; i++){ //percorre os argumentos de entrada e constroi o vetor de variáveis
+            X[i] = strtod(argv[i + 1], &eptr); //converte o valor para Double
+        }
     }
 
-    double matrixA[equationCount][equationCount]; //aloca espaço para a matriz de constantes
-    double matrixB[equationCount]; //aloca espaço para a matriz resultado
+    double** matrixA = (double**) malloc(equationCount*sizeof(double*)); //aloca espaço para a matriz de constantes
+    for(int j=0; j<equationCount; j++)
+        matrixA[j] = (double*) malloc(equationCount*sizeof(double));
+    double* matrixB = (double*) malloc(equationCount*sizeof(double)); //aloca espaço para a matriz resultado
     int rangeWithDecimal = VAL_RANGE * DECIMAL_FACTOR; //deve ser dividido por DECIMAL_FACTOR depois
     double sum = 0.0; //calcula o valor de B para cada equação
     double constant; //calcula cada um dos coeficientes
@@ -52,7 +65,7 @@ int main(int argc, void **argv)
     FILE *arq;
     if((arq = fopen("randomMatrix.txt", "w")) == NULL) //Abre o arquivo
     {
-        printf("Erro na abertura do arquivo randomMatrix.txt\n");
+        //printf("Erro na abertura do arquivo randomMatrix.txt\n");
         exit(1);    
     }
 
