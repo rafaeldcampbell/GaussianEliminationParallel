@@ -1,0 +1,75 @@
+#!/bin/bash
+
+cd src/
+gcc linearEquationSystemGenerator.c -o linearEquationSystemGenerator
+gcc serialGaussianElimination.c -o serialGaussianElimination -lm
+gcc pthreadsGaussianElimination.c -o pthreadsGaussianElimination -lm -lpthread
+mpicc MPIGaussianElimination.c -o MPIGaussianElimination -lm
+gcc openMPGaussianElimination.c -o openMPGaussianElimination -lm -fopenmp
+
+clear
+printf '> Compilando programas'
+sleep 0.5
+clear
+printf '> Compilando programas.'
+sleep 0.5
+clear
+clear
+printf '> Compilando programas..'
+sleep 0.5
+clear
+printf '> Compilando programas...'
+sleep 0.5
+clear
+
+printf '> ./linearEquationSystemGenerator 1.25 2.45 1.15 6.45 21.8\n\n'
+./linearEquationSystemGenerator 1.25 2.45 1.15 6.45 21.8
+sleep 6
+clear
+
+printf '> Carregando randomMatrix.txt\n\n'
+cat randomMatrix.txt
+sleep 7
+clear
+
+printf 'APRESENTANDO TIPOS DE CHAMADAS\n\n'
+sleep 4
+
+printf '> ./serialGaussianElimination \n\n'
+./serialGaussianElimination
+sleep 6
+clear 
+
+printf 'APRESENTANDO TIPOS DE CHAMADAS\n\n'
+printf '> ./serialGaussianElimination -r \n\n'
+./serialGaussianElimination -r
+sleep 6
+clear 
+
+printf 'APRESENTANDO TIPOS DE CHAMADAS\n\n'
+printf '> ./serialGaussianElimination -p \n\n'
+./serialGaussianElimination -p
+sleep 8
+clear 
+
+printf 'APRESENTANDO IMPLEMENTAÇÕES PARALELAS\n\n'
+sleep 4
+
+printf '> ./pthreadsGaussianElimination -r\n\n'
+./pthreadsGaussianElimination -r
+sleep 6
+clear
+
+printf 'APRESENTANDO IMPLEMENTAÇÕES PARALELAS\n\n'
+printf '> ./MPIGaussianElimination -r\n\n'
+mpirun -n 4 MPIGaussianElimination -r
+sleep 6
+clear
+
+printf 'APRESENTANDO IMPLEMENTAÇÕES PARALELAS\n\n'
+printf '> ./openMPGaussianElimination -r\n\n'
+./openMPGaussianElimination -r
+sleep 8
+clear
+
+printf 'FIM\n\n'
