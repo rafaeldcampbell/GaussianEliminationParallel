@@ -66,7 +66,7 @@ void gaussElimination(int m, double **a, double *b){
         }
         //Begin Gauss Elimination
         double term;
-        #pragma omp parallel for shared(a,b) private(term, k,j)
+        #pragma omp parallel for private(term,k,j) schedule(static,1)
         for(k=i+1;k<m;k++){ //para cada linha
             term = a[k][i]/ a[i][i]; //calcula o termo pelo qual a linha pivo sera multiplicada
             for(j=0;j<m;j++){ //para cada coluna
